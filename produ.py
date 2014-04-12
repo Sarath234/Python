@@ -1,25 +1,24 @@
-from multiprocessing import Process, Lock, Queue
-import random, hashlib, time, os
+from multiprocessing import Queue
 import numpy,time
 from numpy import random
 from apscheduler.scheduler import Scheduler
 
 def worker(queue):
-         if queue.qsize() != 0:
-            A = queue.get()
+    A = queue.get()
+    print 'got msg: \n', numpy.dot(A,A)
+    
 def master(queue):
-       A=random.rand(2000,2000)       
-       queue.put(A)
-       print 'Produced msg: \n', A
-
+    A=random.rand(2,2)       
+    queue.put(A)
+    print 'Produced msg: \n', A
+    
 if __name__ == "__main__": 
     queue = Queue()
-    master_lock = Lock()
-    worker_lock = Lock()
     sched=Scheduler()
     sched.start()
     sched.add_cron_job(lambda: master(queue), second='*/1')
     while True:
+        time.sleep(1)
         if queue.qsize()!=0:
             for j in range(queue.qsize()):
                 worker(queue)
