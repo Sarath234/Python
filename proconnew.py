@@ -25,8 +25,9 @@ def master(queue,queue1):
     while True:
         uid=pwd.getpwnam('nobody').pw_uid
         gid=grp.getgrnam('nogroup').gr_gid
-        A=random.rand(2,2).astype('d')
-        #print A
+        matrix_size=[1500,1000,1200,2000,2500]
+        l=matrix_size[rand(0,4)]
+        A=random.rand(l,l).astype('d')
         savetxt('mat'+str(j)+'.txt',A,delimiter=',',fmt='%3.3f')
         A=None
         os.chown('mat.txt',uid,gid)
