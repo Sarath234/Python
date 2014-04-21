@@ -14,8 +14,7 @@ def worker(queue,queue1):
             for j in range(queue1.qsize()):
                 B=queue.get()
                 queue1.get()
-                subprocess.call('mpiexec -n 1 python mulpar.py '+B+'&', shell=True)
-                
+                subprocess.call('mpiexec -f hosts -n 2 python mulpar1.py '+B+'&', shell=True)                
         else:
             print 'Queue is Empty'
         time.sleep(5)
@@ -25,7 +24,7 @@ def master(queue,queue1):
     while True:
         uid=pwd.getpwnam('nobody').pw_uid
         gid=grp.getgrnam('nogroup').gr_gid
-        matrix_size=[105,1000,225,400,200]
+        matrix_size=[2000,2500]
         l=matrix_size[random.randint(1)]
         A=random.rand(l,l).astype('d')
         savetxt('mat'+str(j)+'.txt',A,delimiter=',',fmt='%3.3f')
@@ -34,7 +33,10 @@ def master(queue,queue1):
         queue.put('mat'+str(j)+'.txt')
         queue1.put(1)
         j=j+1
-        time.sleep(1)
+        per=(subprocess.check_output('ssh root@192.168.32.218 nohup python /export/user/psutilexe.py',stdin=None,stderr=subprocess.STDOUT,shell=True)).split(' ')
+        print 'CPU %=',float(per[0])
+        print 'MEM %=',float(per[1])
+        time.sleep(2)
        
 if __name__ == "__main__": 
     queue = Queue()
