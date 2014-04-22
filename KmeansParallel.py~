@@ -166,5 +166,5 @@ def main():
 
             newCentroidList = numpy.array(newCentroidList)
             oldCentroidList = numpy.array(oldCentroidList)
-    	    #plotCluster(cluster_list)
+    	    plotCluster(cluster_list)
 main()
