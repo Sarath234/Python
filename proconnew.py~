@@ -9,23 +9,22 @@ import numpy as np
 
 def worker(queue,queue1):
     while True:
-        print 'before worker',queue1.qsize()
+        time.sleep(2)
         if queue1.qsize()!=0:
             for j in range(queue1.qsize()):
+                print 'before worker',queue1.qsize()
                 B=queue.get()
                 queue1.get()
-                subprocess.call('mpiexec -n 1 python mulpar.py '+B+'&', shell=True)
-                
+                subprocess.call('mpiexec -n 1 python mulpar.py '+B+'&', shell=True)     
         else:
             print 'Queue is Empty'
-        time.sleep(5)
 
 def master(queue,queue1):
     j=0
     while True:
         uid=pwd.getpwnam('nobody').pw_uid
         gid=grp.getgrnam('nogroup').gr_gid
-        matrix_size=[105,1000,225,400,200]
+        matrix_size=[2,4]
         l=matrix_size[random.randint(1)]
         A=random.rand(l,l).astype('d')
         savetxt('mat'+str(j)+'.txt',A,delimiter=',',fmt='%3.3f')
