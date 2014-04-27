@@ -116,7 +116,7 @@ def main():
         splitData = list()
         x = split_list(data.tolist(),no_of_cores) #generator object containing the split
  
-        newCentroidList = getRandomCentroids(no_of_clusters)
+        newCentroidList = loadtxt('centroid.txt') #getRandomCentroids(no_of_clusters)
 
         for i in range(0,no_of_cores):
             dataOnCore = next(x)
@@ -153,10 +153,10 @@ def main():
             oldCentroidList = newCentroidList
             newCentroidList = list()
             for i, c in enumerate(cluster_list):
-                print(i)
-                print("Cluster", i, c.getPoints())
-                print("Centroid", c.getCentroid())
-                print("")
+                #print(i)
+                #print("Cluster", i, c.getPoints())
+                #print("Centroid", c.getCentroid())
+                #print("")
                 if c.getPoints():
                     centroid = findCentroid(c).tolist()
                 else:
