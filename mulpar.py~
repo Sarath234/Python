@@ -8,11 +8,19 @@ t=time.time() #to get computation time
 comm=MPI.COMM_WORLD
 size = comm.Get_size()
 rank = comm.Get_rank()
+<<<<<<< HEAD
 if rank==0:
     A=loadtxt(sys.argv[1],delimiter=',') # A Matrix 
     l=len(A) #No of Rows
     n=len(A)/size #No of rows for Each processor
     rem=len(A)%size #Remaining rows
+=======
+A=loadtxt(sys.argv[1],delimiter=',') # A Matrix 
+#print A
+l=len(A) #No of Rows
+n=len(A)/size #No of rows for Each processor
+rem=len(A)%size #Remaining rows
+>>>>>>> d3e651fb3d26c64be63143a59a3e71d970972241
 
 if rem==0:
     a=rank*n
