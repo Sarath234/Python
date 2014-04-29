@@ -4,8 +4,6 @@ import math
 import pwd
 import grp
 import os
-import numpy as np
-import matplotlib
 
 def init_board(N):
     X = numpy.array([(round(random.uniform(-10, 10),2), round(random.uniform(-10, 10),2)) for i in range(N)])
@@ -17,12 +15,11 @@ def getRandomCentroids(k):
 
 uid=pwd.getpwnam('nobody').pw_uid
 gid=grp.getgrnam('nogroup').gr_gid
-B=init_board(5000)
+B=init_board(int(sys.argv[1]))
 print B
 savetxt('data.txt',B)
 os.chown('data.txt',uid,gid)
-centroidlist=getRandomCentroids(5)
+centroidlist=getRandomCentroids(int(sys.argv[2]))
 print centroidlist
 savetxt('centroid.txt',centroidlist)
 os.chown('centroid.txt',uid,gid)
-
