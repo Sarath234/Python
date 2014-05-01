@@ -1,0 +1,44 @@
+import scipy.io
+import numpy as np
+import matplotlib.pyplot as plt
+
+def my_range(start,end,step):
+    while start<=end:
+        yield start
+        start+=step
+
+mat=scipy.io.loadmat('rawdata.mat')
+b=mat['b']
+mat=None
+x=b[:,0]
+y=b[:,1]
+z=b[:,2]
+b=None
+temp1=[]
+temp2=[]
+temp3=[]
+#print x,y,z
+for i in my_range(0,410,10):
+    temp1.append(y[i:i+10])
+    temp2.append(z[i:i+10])
+    temp3.append(x[i:i+10])
+#    plt.plot(temp1,temp2)
+#    plt.show()
+#print "\n",len(temp1)
+#print "\n",temp2[40]
+#for j in range(0,len(temp1)-2):
+#    plt.plot(temp1[j],temp2[j])
+c = {40,37,28,22,11}
+#print temp1[40],temp2[40],temp3[40]
+p=['--','--o','--*','->','-^']
+for i, l in enumerate(c):
+        print temp1[l],temp2[l],temp3[l]
+	plt.plot(temp1[l],temp2[l],p[i],label=str(temp3[l][1]))
+
+#plt.plot(temp1[39],temp2[39],'r')
+plt.legend( loc='upper right', numpoints = 1 )
+plt.title('Response Time vs No of VMs')
+plt.xlabel('No of VMs')
+plt.ylabel('Response Time for Different Matrix Sizes')
+plt.grid(True)
+plt.show()

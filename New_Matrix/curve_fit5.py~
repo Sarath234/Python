@@ -1,0 +1,13 @@
+import scipy.io
+import numpy as np
+import matplotlib.pyplot as plt
+mat=scipy.io.loadmat('coevsgudness.mat')
+
+b=mat['coevsgudness']
+plt.plot(b[:,0],b[:,1])
+plt.legend( loc='upper left')
+plt.title('Response Time vs Size of Matrix')
+plt.xlabel('Size of Matrix')
+plt.ylabel('Response Time for Different no of VMs')
+plt.grid(True)
+plt.show()
