@@ -5,9 +5,9 @@ mat=scipy.io.loadmat('coevsgudness.mat')
 
 b=mat['coevsgudness']
 plt.plot(b[:,0],b[:,1])
-plt.legend( loc='upper left')
-plt.title('Response Time vs Size of Matrix')
-plt.xlabel('Size of Matrix')
-plt.ylabel('Response Time for Different no of VMs')
+plt.
+plt.title('Percentage fit vs No of coefficients')
+plt.xlabel('No of coefficients')
+plt.ylabel('Percentage fit')
 plt.grid(True)
 plt.show()
