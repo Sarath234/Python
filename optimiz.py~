@@ -15,7 +15,16 @@ z=z.reshape(60,1)
 
 vms=[0.0]*10
 
-def vm1(vms,argmt,minv):
+def vmupdation(vms):
+    totalvms=10
+    busyvms=0
+    for n in range(0,len(vms)):
+        if vms[n]!=0:
+            busyvms+=1
+    av_vms=totalvms-busyvms
+    return av_vms
+
+def vm(vms,argmt,minv):
     vm=[]
     vms=sorted(vms)
     for i in range(0,len(argmt)):
@@ -57,7 +66,7 @@ def creatmat(queue,queue2):
                     else:
                         A[k,j-1]=0
 #            print A
-            N=vms.count(0)
+            N=vmupdation(vms)
 #            print N
 #            N=10
             y=0
@@ -72,11 +81,8 @@ def creatmat(queue,queue2):
 #            print argmt
 #            print minv
             if y<=N:
-                if vms.count(0)==0:
-                    time.sleep(2)
-                    vms=vm1(vms,argmt,minv)
-                else:
-                    vms=vm1(vms,argmt,minv)
+#                vms=queue2.get()
+                vms=vm(vms,argmt,minv)
                 for i in range(0,len(argmt)):
                     for j in range(0,argmt[i]):
                         vms[i]=minv[i]
@@ -88,7 +94,7 @@ def creatmat(queue,queue2):
                 extradelay=[]
                 J_lis=[]
                 minv=[]
-                N=vms.count(0)
+                N=vmupdation(vms)
                 excess=y-N
 #                print excess
                 for m in range(0,A.shape[0]):
@@ -111,13 +117,9 @@ def creatmat(queue,queue2):
                 print 'Total Delay= ',delay
                 for q in range(0,len(J_lis)):
                     J_lis[q]=J_lis[q]+1
-                if vms.count(0)==0:
-                    time.sleep(2)
-                    vms=vm1(vms,J_lis,minv)
-                else:
-                    vms=vm1(vms,J_lis,minv)
-#                vms=vm1(vms,J_lis,minv)
-#                print vms
+#                vms=queue2.get()
+                vms=vm(vms,J_lis,minv)
+                print vms
                 queue2.put(vms)
             time.sleep(5)
         else:
