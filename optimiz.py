@@ -65,9 +65,9 @@ def creatmat(queue,queue2):
                         A[k,j-1]=ab
                     else:
                         A[k,j-1]=0
-            print A
+#            print A
             N=vmupdation(vms)
-            print N
+#            print N
 #            N=10
             y=0
             delay=0
@@ -86,7 +86,7 @@ def creatmat(queue,queue2):
                 for i in range(0,len(argmt)):
                     for j in range(0,argmt[i]):
                         vms[i]=minv[i]
-#                print "No Dealy"
+                print "No Dealy"
                 print vms
                 queue2.put(vms)
 
@@ -96,7 +96,7 @@ def creatmat(queue,queue2):
                 minv=[]
                 N=vmupdation(vms)
                 excess=y-N
-                print excess
+#                print excess
                 for m in range(0,A.shape[0]):
                     J=np.argmin(A[m,:])
                     extradelay.append(A[m,J-1]-A[m,J])
@@ -124,7 +124,7 @@ def creatmat(queue,queue2):
             time.sleep(5)
         else:
             print 'Queue is Empty'
-            time.sleep(5)
+            time.sleep(2)
 
 def jobcreat(queue):
     x=0
