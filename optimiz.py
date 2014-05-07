@@ -39,15 +39,16 @@ def creatmat(queue,queue2):
         vms=queue2.get()
         if queue.qsize()!=0:
             quejob=queue.get()
-            i = len(quejob)/2
-	    s = []
+            i = (len(quejob)-1)/2
+            s = []
   	    dt = []
+            tim=quejob[-1]
             while (i>0):
                 s.append(quejob[2*i-2])
                 dt.append(quejob[2*i-1])
-		i = i - 1
-#	    print s,'\n',dt
-
+                i = i - 1
+#	    print s,'\n',dt,'\n',tim
+        
             A=np.zeros(shape=(len(s),10))
             for j in range(1,11):
 	        for k in range(0,len(s)):
@@ -58,7 +59,7 @@ def creatmat(queue,queue2):
                         A[k,j-1]=0
 #            print A
             N=vms.count(0)
-            print N
+#            print N
 #            N=10
             y=0
             delay=0
@@ -81,7 +82,7 @@ def creatmat(queue,queue2):
                     for j in range(0,argmt[i]):
                         vms[i]=minv[i]
                 print "No Dealy"
-                print vms
+#                print vms
                 queue2.put(vms)
 
             else:
@@ -89,6 +90,7 @@ def creatmat(queue,queue2):
                 J_lis=[]
                 minv=[]
                 N=vms.count(0)
+                print "VMs are free= ", N
                 excess=y-N
 #                print excess
                 for m in range(0,A.shape[0]):
@@ -108,7 +110,7 @@ def creatmat(queue,queue2):
 #                    print A[p,J_lis[p]-1]
                     delay=delay+A[p,J_lis[p]-1]
                     minv.append(A[p,J_lis[p]-1])
-                print 'Total Delay= ',delay
+                print 'Total Delay= ', time.time()-tim+delay,'Delay Test= ',delay
                 for q in range(0,len(J_lis)):
                     J_lis[q]=J_lis[q]+1
                 if vms.count(0.0)==0:
@@ -123,25 +125,27 @@ def creatmat(queue,queue2):
         else:
             print 'Queue is Empty'
             time.sleep(2)
-
 def jobcreat(queue):
     x=0
     while True:
-        batchsize=random.randint(1,5)
-        job=[]
-        for p in range(0,batchsize):
-            matsize=[2400,2750,2850,2900,2950,3000]
-            dedtim=[9,10,8,7,5,4,6]
-            x=x+1
-            mat_size=matsize[random.randint(0,5)]
-            d_tim=dedtim[random.randint(0,5)]
-            job.append(mat_size)
-            job.append(d_tim)
-#        print job
-        queue.put(job)
-        time.sleep(5)
-
-def vmtimupdation(queue2):
+        if queue.qsize()<10:
+            batchsize=random.randint(1,5)
+            job=[]
+            for p in range(0,batchsize):
+                matsize=[2400,2750,2850,2900,2950,3000]
+                dedtim=[9,10,8,7,5,4,6]
+                x=x+1
+                mat_size=matsize[random.randint(0,5)]
+                d_tim=dedtim[random.randint(0,5)]
+                job.append(mat_size)
+                job.append(d_tim)
+            job.append(time.time())
+#            print job
+            queue.put(job)
+            time.sleep(5)
+        else:
+            time.sleep(200)
+def vmtimupdation(queue2,queue):
     while True:
         vms=queue2.get()
         for s in range(0,len(vms)):
@@ -150,6 +154,7 @@ def vmtimupdation(queue2):
                 if vms[s]<0:
                     vms[s]=0.0
         print vms
+        print 'queue size= ',queue.qsize()
         queue2.put(vms)
         time.sleep(1)
 
@@ -160,4 +165,4 @@ if __name__ == "__main__":
     lock=Lock()
     Process(target=jobcreat,args=(queue,)).start()
     Process(target=creatmat,args=(queue,queue2)).start()
-    Process(target=vmtimupdation,args=(queue2,)).start()
+    Process(target=vmtimupdation,args=(queue2,queue)).start()
