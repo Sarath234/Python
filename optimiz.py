@@ -58,7 +58,7 @@ def creatmat(queue,queue2):
                         A[k,j-1]=0
 #            print A
             N=vms.count(0)
-#            print N
+            print N
 #            N=10
             y=0
             delay=0
@@ -72,8 +72,8 @@ def creatmat(queue,queue2):
 #            print argmt
 #            print minv
             if y<=N:
-                if vms.count(0)==0:
-                    time.sleep(2)
+                if vms.count(0.0)==0:
+                    time.sleep(np.min(vms))
                     vms=vm1(vms,argmt,minv)
                 else:
                     vms=vm1(vms,argmt,minv)
@@ -111,12 +111,12 @@ def creatmat(queue,queue2):
                 print 'Total Delay= ',delay
                 for q in range(0,len(J_lis)):
                     J_lis[q]=J_lis[q]+1
-                if vms.count(0)==0:
-                    time.sleep(2)
+                if vms.count(0.0)==0:
+#                    print np.min(vms)
+                    time.sleep(np.min(vms))
                     vms=vm1(vms,J_lis,minv)
                 else:
                     vms=vm1(vms,J_lis,minv)
-#                vms=vm1(vms,J_lis,minv)
 #                print vms
                 queue2.put(vms)
             time.sleep(5)
