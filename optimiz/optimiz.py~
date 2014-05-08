@@ -36,9 +36,9 @@ def find_time(a,b):
 
 def creatmat(queue,queue2):
     delay2=[]
-    x=0
-    while x<20:
-        x+=1
+#    x=0
+    while True:
+#        x+=1
         if queue.qsize()!=0:
             vms=queue2.get()
             quejob=queue.get()
@@ -84,8 +84,7 @@ def creatmat(queue,queue2):
                 for i in range(0,len(argmt)):
                     for j in range(0,argmt[i]):
                         vms[i]=minv[i]
-                print "No Dealy"
-#                print vms
+#                print "No Dealy"
                 delay2.append(time.time()-tim)
                 queue2.put(vms)
 
@@ -116,9 +115,11 @@ def creatmat(queue,queue2):
                     minv.append(A[p,J_lis[p]-1])
                 delay2.append(time.time()-tim+delay)
 #                np.savetxt('delay.txt',delay2,fmt='%3.2f')
-                print 'Total Delay= ', time.time()-tim+delay,'Delay Test= ',delay
+#                print 'Total Delay= ', time.time()-tim+delay#,'Delay Test= ',delay
                 for q in range(0,len(J_lis)):
                     J_lis[q]=J_lis[q]+1
+                print J_lis
+#                print minv
                 if vms.count(0.0)==0:
 #                    print np.min(vms)
                     time.sleep(np.min(vms))
@@ -131,12 +132,12 @@ def creatmat(queue,queue2):
         else:
             print 'Queue is Empty'
             time.sleep(2)
-    np.savetxt('delay.txt',delay2,fmt='%3.2f')
+#    np.savetxt('delay.txt',delay2,fmt='%3.2f')
 
 def jobcreat(queue):
-    x=0
-    while x<20:
-        x+=1
+#    x=0
+    while True:
+#        x+=1
         if queue.qsize()<10:
             batchsize=random.randint(1,5)
             job=[]
@@ -157,8 +158,8 @@ def jobcreat(queue):
 def vmtimupdation(queue2,queue):
     quesiz=[]
     vmsfree=[]
-    x=0
-    while x<100:
+#    x=0
+    while True:
         vms=queue2.get()
         for s in range(0,len(vms)):
             if vms[s]>0:
@@ -171,11 +172,11 @@ def vmtimupdation(queue2,queue):
         vmsfree.append(vms.count(0))
         quesiz.append(queue.qsize())
         queue2.put(vms)
-        x+=1
+#        x+=1
         time.sleep(1)
 
-    np.savetxt('vms.txt',vmsfree,fmt='%3.0f')
-    np.savetxt('queue.txt',quesiz,fmt='%3.0f')
+#    np.savetxt('vms.txt',vmsfree,fmt='%3.0f')
+#    np.savetxt('queue.txt',quesiz,fmt='%3.0f')
 
 if __name__ == "__main__": 
     queue = Queue()
