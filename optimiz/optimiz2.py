@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.io
 from multiprocessing import Process, Lock, Queue
-import random,time
+import random,time,pickle
 
 mat=scipy.io.loadmat('simulationdata.mat')
 b=mat['simulationdata']
@@ -28,6 +28,7 @@ def vm1(vms,argmt,minv):
         vms[i]=vm[i]
     return vms
 
+
 def find_tim(a,b):
     for i in range(0,len(x[:,0])):
         if a==x[i,0]:
@@ -38,7 +39,7 @@ def find_tim(a,b):
 def sharedalgo(queue,queue2):
     w=0
     abc=[]
-    while w<20:
+    while w<21:
         w+=1
         if queue.qsize()!=0:
             vms=queue2.get()
@@ -51,33 +52,47 @@ def sharedalgo(queue,queue2):
                 s.append(quejob[2*i-2])
                 dt.append(quejob[2*i-1])
                 i = i - 1
+            s=s[::-1]
+            dt=dt[::-1]
 #            print s,'\n',dt,'\n',tim
-#            print 'dt= ',dt
-#            print 's= ',s
             K=vms.count(0.0)
             queue2.put(vms)
-            
+
             while vms.count(0)<len(s):
                 vms=queue2.get()
                 freVMs=vms.count(0)
                 Ln_vms=len(vms)
                 req_vms=len(s)-freVMs
-#                print 'free vms ', freVMs
-#                print 'lenght of jobs ', len(s)
-                print 'required vms ', len(s)-freVMs
+                print 'free vms ', freVMs
+                print 'lenght of jobs ', len(s)
+                print 'required vms ', req_vms
                 if Ln_vms<10:
-                    for i in range(0,req_vms):
-                        vms.append(0)
-                    queue2.put(vms)
-                else:
+                    if Ln_vms+req_vms>10:
+                        for i in range(0,10-Ln_vms):                        
+                            vms.append(0)
+                        req_vms=0
+                        queue2.put(vms)
+                    else:
+                        for i in range(0,req_vms):
+                            vms.append(0)
+                        req_vms=0
+                        queue2.put(vms)
+                elif Ln_vms==10:
                     queue2.put(vms)
                     while req_vms>0:
+                        print '\n reached exactly 10 vms'
+                        print '\n req vms = ' , req_vms
+			vms=queue2.get()
+			print '\n vms = ', vms                        
+			queue2.put(vms)
                         time.sleep(np.min(vms))
                         vms=queue2.get()
                         frvm=vms.count(0)
-                        queue2.put(vms)
+			print 'free vms = ', frvm
+                        print 'Im Working'
                         req_vms=req_vms-frvm
-                    
+			print '\n vms 1 = ' ,vms
+			queue2.put(vms)
 
             vms=queue2.get()
             N=vms.count(0.0)
@@ -114,16 +129,31 @@ def sharedalgo(queue,queue2):
             print 'Queue is Empty'
             abc.append(0)
             time.sleep(5)
-    np.savetxt('delay.txt',abc,fmt='%3.2f')
+    np.savetxt('delay_shared.txt',abc,fmt='%3.2f')
+
 def jobcreat(queue,queue2):
     w=0
     job1=[]
-    while w<20:
-        w+=1
-        vms=queue2.get()
-        queue2.put(vms)
+    data=pickle.load(open('job11.txt','rb'))
+    for i in data:
         if queue.qsize()<10:
-             if len(vms)<=10:
+#            job.append(i)
+#            print i
+            i.append(time.time())
+#            print i
+            queue.put(i)
+            time.sleep(5)
+        else:
+            time.sleep(20)
+
+
+'''def jobcreat(queue,queue2):
+    w=0
+    job1=[]
+    job_run=True
+    while w<50:
+        w+=1
+        if queue.qsize()<10:
                 batchsize=random.randint(1,2)
                 job=[]
                 for p in range(0,batchsize):
@@ -138,11 +168,10 @@ def jobcreat(queue,queue2):
                 job1.append(job)
                 queue.put(job)
                 time.sleep(5)
-             else:
-                time.sleep(5)
         else:
             time.sleep(20)
-#    np.savetxt('job.txt',job1,delimiter=',')
+    job_run=False
+#    np.savetxt('job.txt',job1,delimiter=',')'''
 
 
 def vmtimupdation(queue2,queue):
@@ -150,7 +179,7 @@ def vmtimupdation(queue2,queue):
     vmsfree=[]
     No_of_vm=[]
     w=0
-    while w<100:
+    while w<180:
         w+=1
         vms=queue2.get()
         for s in range(0,len(vms)):
@@ -160,6 +189,7 @@ def vmtimupdation(queue2,queue):
                     vms[s]=0.0
         queue2.put(vms)
         print vms
+        print 'w=',w
         print 'len= ',len(vms)
         print 'Free vms= ', vms.count(0)
         print 'queue size= ',queue.qsize()
@@ -167,9 +197,9 @@ def vmtimupdation(queue2,queue):
         vmsfree.append(vms.count(0))
         quesiz.append(queue.qsize())
         time.sleep(1)
-    np.savetxt('len.txt',No_of_vm,fmt='%3.0f')
-    np.savetxt('vms.txt',vmsfree,fmt='%3.0f')
-    np.savetxt('queue.txt',quesiz,fmt='%3.0f')
+    np.savetxt('len_shared.txt',No_of_vm,fmt='%3.0f')
+    np.savetxt('vms_shared.txt',vmsfree,fmt='%3.0f')
+    np.savetxt('queue_shared.txt',quesiz,fmt='%3.0f')
 
 if __name__ == "__main__": 
     queue = Queue()
