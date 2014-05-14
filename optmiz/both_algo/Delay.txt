@@ -1,0 +1,3 @@
+Shared Algo Total Delay= 1026.13
+Our Algo Total Delay= 506.39
+
