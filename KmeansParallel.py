@@ -2,7 +2,7 @@ import sys, math, random, numpy
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 from numpy import *
-
+import time
 comm=MPI.COMM_WORLD
 size = comm.Get_size()
 rank = comm.Get_rank()
@@ -91,7 +91,8 @@ def findCentroid(c):
 
 def plotCluster(cList):
     i = 0
-    colors = list("bgrcmyk")
+#    colors = list("bgrcmyk")
+    colors = list("_x.+|")
     for cluster in cList:
 	if (cluster.getPoints()==[]):
 	    print("Null")
@@ -99,24 +100,27 @@ def plotCluster(cList):
 	    color = colors[i % len(colors)]
         #print(cluster.getPoints())
             x,y = cluster.getPoints()[:,0],cluster.getPoints()[:,1]
-            plt.scatter(x,y,c=color)
+            plt.figure(1)
+            plt.scatter(x,y,marker=color)#c=color)
+            
         #print(cluster.getCentroid())
         #plt.scatter(cluster.getCentroid()[0],cluster.getCentroid()[1],s = 100,c = color,marker = '+')
         #plt.plot(mList[i][0],mList[i][1],color)
             i += 1
     plt.show()
-
+#    plt.draw()
+#    time.sleep(5)
 def main():
 
     if rank==0:
-        data = loadtxt('data.txt') #init_board(10) #initialize the data
+        data = init_board(50) #loadtxt('data.txt') #init_board(10) #initialize the data
         #print(data.tolist())
         #print("")
         no_of_clusters = 5 #no of clusters
         splitData = list()
         x = split_list(data.tolist(),no_of_cores) #generator object containing the split
  
-        newCentroidList = loadtxt('centroid.txt') #getRandomCentroids(no_of_clusters)
+        newCentroidList = getRandomCentroids(no_of_clusters)#loadtxt('centroid.txt') #getRandomCentroids(no_of_clusters)
 
         for i in range(0,no_of_cores):
             dataOnCore = next(x)
@@ -129,7 +133,7 @@ def main():
 
 #        print(newCentroidList)
 
-    for k in range(0,10):
+    for k in range(0,20):
         if rank==0:
             for i in range(0,no_of_cores):
                 comm.send(newCentroidList,dest=i+1,tag=2)
@@ -166,5 +170,5 @@ def main():
 
             newCentroidList = numpy.array(newCentroidList)
             oldCentroidList = numpy.array(oldCentroidList)
-    	    #plotCluster(cluster_list)
+    	    plotCluster(cluster_list)
 main()

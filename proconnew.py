@@ -7,17 +7,17 @@ import grp
 import os,time
 import numpy as np
 
-def worker(queue,queue1):
+'''def worker(queue,queue1):
     while True:
         print 'before worker',queue1.qsize()
         if queue1.qsize()!=0:
             for j in range(queue1.qsize()):
                 B=queue.get()
                 queue1.get()
-                subprocess.call('mpiexec -f hosts -n 2 python mulpar1.py '+B+'&', shell=True)                
+                subprocess.call('mpiexec -f hosts -n 4 python mulpar1.py '+B+'&', shell=True)                
         else:
             print 'Queue is Empty'
-        time.sleep(5)
+        time.sleep(5)'''
 
 def master(queue,queue1):
     j=0
@@ -33,13 +33,14 @@ def master(queue,queue1):
         queue.put('mat'+str(j)+'.txt')
         queue1.put(1)
         j=j+1
-        per=(subprocess.check_output('ssh root@192.168.32.218 nohup python /export/user/psutilexe.py',stdin=None,stderr=subprocess.STDOUT,shell=True)).split(' ')
-        print 'CPU %=',float(per[0])
-        print 'MEM %=',float(per[1])
+        print j
+#        per=(subprocess.check_output('ssh root@192.168.32.218 nohup python /export/user/psutilexe.py',stdin=None,stderr=subprocess.STDOUT,shell=True)).split(' ')
+#        print 'CPU %=',float(per[0])
+#        print 'MEM %=',float(per[1])
         time.sleep(2)
        
 if __name__ == "__main__": 
     queue = Queue()
     queue1 = Queue()
     Process(target=master,args=(queue,queue1,)).start()
-    Process(target=worker, args=(queue,queue1,)).start()
+#    Process(target=worker, args=(queue,queue1,)).start()
