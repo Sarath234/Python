@@ -142,18 +142,18 @@ def optialgo(queue,queue2):
 #                print "VMs are free= ", N
                 excess=y-N
 #                print excess
-                temp=[]
+                ass=[]
                 min_=[0]*len(argmt)
                 truth_value=True
                 for n in range(0,len(argmt)):
                     if argmt[n]==1:
-                        temp.append(n)
+                        ass.append(n)
                         min_[n]=0
                     else:
 #                        print 'argment= ',argmt
                         min_[n]=A[n,argmt[n]-2]-A[n,argmt[n]-1]
 
-                if len(temp)==len(argmt):
+                if len(ass)==len(argmt):
                     truth_value=False
 #                print 'argment= ',argmt
 #                print 'min_= ',min_
@@ -162,8 +162,8 @@ def optialgo(queue,queue2):
                     xtemp=min_[m]-minv[m]
                     extradelay.append(xtemp)
                 max1= np.max(extradelay)+1
-                for m in range(0,len(temp)):
-                    extradelay[temp[m]]=max1
+                for m in range(0,len(ass)):
+                    extradelay[ass[m]]=max1
 #                print extradelay
                 while excess>0 and truth_value==True:
                     I=np.argmin(extradelay)
