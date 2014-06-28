@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.io
 from multiprocessing import Process, Lock, Queue
-import random,time
+import random,time,pickle
 
-mat=scipy.io.loadmat('simulationdata.mat')
+mat=scipy.io.loadmat('simulation1.mat')
 b=mat['simulationdata']
 mat=None
 x=b[:,0]
@@ -58,12 +58,10 @@ def mat_creat(s,dt,free_vms):
     return A
 
 def optialgo(queue,queue2):
-    w=0
     delay2=[]
-    while w<30:
-        w+=1
+    while True:
         if queue.qsize()!=0:
-            vms=queue2.get()
+#            vms=queue2.get()
             quejob=queue.get()
             i = (len(quejob)-1)/2
             s = []
@@ -76,36 +74,52 @@ def optialgo(queue,queue2):
             s=s[::-1]
             dt=dt[::-1]
 #            print s,'\n',dt,'\n',tim
-            K=vms.count(0.0)
+            vms=queue2.get()
             queue2.put(vms)
+            K=vms.count(0.0)
 
             while vms.count(0)<len(s):
                 vms=queue2.get()
+                queue2.put(vms)
+
                 freVMs=vms.count(0)
                 Ln_vms=len(vms)
                 req_vms=len(s)-freVMs
 #                print 'free vms ', freVMs
 #                print 'lenght of jobs ', len(s)
-#                print 'required vms ', len(s)-freVMs
+#                print 'required vms ', req_vms
+
                 if Ln_vms<10:
-                    if Ln_vms==9 and req_vms==2:
-                        vms.append(0)
+                    if Ln_vms+req_vms>10:
+                        vms=queue2.get()
+                        for i in range(0,10-Ln_vms):                        
+                            vms.append(0)
                         queue2.put(vms)
+                        req_vms=0
                     else:
+                        vms=queue2.get()
                         for i in range(0,req_vms):
                             vms.append(0)
                         queue2.put(vms)
-                else:
-                    queue2.put(vms)
+                        req_vms=0
+                elif Ln_vms==10:
                     while req_vms>0:
+#                        print '\n reached exactly 10 vms'
+#                        print '\n req vms = ' , req_vms
+			vms=queue2.get()
+#			print '\n vms = ', vms
+			queue2.put(vms)
                         time.sleep(np.min(vms))
-                        vms=queue2.get()
                         frvm=vms.count(0)
-                        queue2.put(vms)
+#			print 'free vms = ', frvm
 #                        print 'Im Working'
                         req_vms=req_vms-frvm
-
+#			print '\n vms 1 = ' ,vms
+               
             vms=queue2.get()
+            queue2.put(vms)
+
+#	    print '\n vms 2 = ' ,vms
             N=vms.count(0)
             A= mat_creat(s,dt,N)
 #            print 'A= ',A
@@ -119,7 +133,6 @@ def optialgo(queue,queue2):
                 argmt.append(np.argmin(A[l,:])+1)
                 minv.append(np.min(A[l,:]))
                 y=y+argmt[l]
-                delay=delay+np.min(A[l,:])
 #            print 'minv= ',minv
             if y<=N:
 #                print argmt
@@ -127,14 +140,19 @@ def optialgo(queue,queue2):
                 minvv=[]
                 for i in range(0,len(s)):
                     minvv.append(find_tim(s[i],argmt[i]))
-
+                vms=queue2.get()
                 vms=vm1(vms,argmt,minvv)
 #                print 'if',vms
                 queue2.put(vms)
-                print "Delay in if= ",time.time()-tim
-                delay2.append(time.time()-tim)
-                time.sleep(5)
-
+                delay_if=0
+                for i in range(0,len(s)):
+                    xyz=minvv[i]-dt[i]
+                    if xyz>=0:
+                        delay_if=delay_if+minvv[i]-dt[i]
+                    else:
+                        delay_if=delay_if
+                delay2.append(time.time()-tim+delay_if)
+                print "Delay New in if= ",time.time()-tim+delay_if
             else:
                 extradelay=[]
                 J_lis=[]
@@ -165,11 +183,21 @@ def optialgo(queue,queue2):
                 for m in range(0,len(temp)):
                     extradelay[temp[m]]=max1
 #                print extradelay
-                while excess>0 and truth_value==True:
-                    I=np.argmin(extradelay)
-                    argmt[I]=argmt[I]-1
-                    extradelay[I]=A[I,argmt[I]-2]-A[I,argmt[I]-1]
-                    excess=excess-1
+#		print 'Algo Begin \n\n'                
+		while excess>0 and truth_value==True:
+#                    print 'excess \n', excess    
+#                    print '\n A \n \n', A
+		    I=np.argmin(extradelay)
+#		    print '\n I ', I 
+#		    print '\n argmt ', argmt
+                    if argmt[I] != 1:
+			argmt[I]=argmt[I]-1
+#		        print '\n val ', A[I,argmt[I]-2] 
+                        extradelay[I]=A[I,argmt[I]-2]-A[I,argmt[I]-1]
+                        excess=excess-1
+		    else:
+ 		        max2 = np.max(extradelay)+1
+			extradelay[I] = max2
                     truth=0
                     for m in range(0,len(argmt)):
                         truth=truth+argmt[m]
@@ -178,12 +206,14 @@ def optialgo(queue,queue2):
 #                print 'extradelay list', extradelay
 
                 minvv=[]
-#                print argmt
+#                print 'argmt ',argmt
+#                print 'minv ',minv
 #                print s
                 for i in range(0,len(argmt)):
 #                    print argmt[i]
 #                    print s[i]
                     minvv.append(find_tim(s[i],argmt[i]+1))
+                vms=queue2.get()
                 vms=vm1(vms,argmt,minvv)
                 queue2.put(vms)
 #                print dt
@@ -195,50 +225,27 @@ def optialgo(queue,queue2):
                         delay=delay+minvv[i]-dt[i]
                     else:
                         delay=delay
-
-                print 'delay New= ',delay+time.time()-tim
                 delay2.append(time.time()-tim+delay)
-
-                time.sleep(5)
-        else:
-            print 'Queue is Empty'
-            delay2.append(0)
-            time.sleep(2)
-    np.savetxt('delay.txt',delay2,fmt='%3.2f')
+                print 'delay New= ',delay+time.time()-tim
+        np.savetxt('delay.txt',delay2,fmt='%3.2f')
 
 def jobcreat(queue,queue2):
-    w=0
     job1=[]
-    while w<20:
-        w+=1
-        if queue.qsize()<10:
-                batchsize=random.randint(1,2)
-                job=[]
-                for p in range(0,batchsize):
-                    matsize=[2400,2750,2850,2900,2950,3000]
-                    dedtim=[20,25,26,28,9,8]
-                    mat_size=matsize[random.randint(0,5)]
-                    d_tim=dedtim[random.randint(0,5)]
-                    job.append(mat_size)
-                    job.append(d_tim)
-                job.append(time.time())
-#                print job
-                job1.append(job)
-                queue.put(job)
-                time.sleep(5)
-        else:
-            time.sleep(20)
-
-#    np.savetxt('job.txt',job1,delimiter=',')
-
+    data=pickle.load(open('job11.txt','rb'))
+    for i in data:
+#            job.append(i)
+#            print i
+        i.append(time.time())
+#            print i
+#        print 'job',i
+        queue.put(i)
+        time.sleep(5)
 
 def vmtimupdation(queue2,queue):
     quesiz=[]
     vmsfree=[]
     No_of_vm=[]
-    w=0
-    while w<100:
-        w+=1
+    while True:
         vms=queue2.get()
         for s in range(0,len(vms)):
             if vms[s]>0:
@@ -246,18 +253,19 @@ def vmtimupdation(queue2,queue):
                 if vms[s]<=0:
                     vms[s]=0.0
         queue2.put(vms)
-        print vms
-        print 'len= ',len(vms)
-        print 'Free vms= ', vms.count(0)
+        print sorted(vms)
+#        print 'len= ',len(vms)
+#        print 'Free vms= ', vms.count(0)
         print 'queue size= ',queue.qsize()
+#        print 'w= ',w
         No_of_vm.append(len(vms))    
         vmsfree.append(vms.count(0))
         quesiz.append(queue.qsize())
         time.sleep(1)
 
-    np.savetxt('len.txt',No_of_vm,fmt='%3.0f')
-    np.savetxt('vms.txt',vmsfree,fmt='%3.0f')
-    np.savetxt('queue.txt',quesiz,fmt='%3.0f')
+        np.savetxt('len.txt',No_of_vm,fmt='%3.0f')
+        np.savetxt('vms.txt',vmsfree,fmt='%3.0f')
+        np.savetxt('queue.txt',quesiz,fmt='%3.0f')
 
 if __name__ == "__main__":
     queue = Queue()

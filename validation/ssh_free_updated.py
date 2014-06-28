@@ -87,6 +87,7 @@ def vm1(s,argmt,freeVMs):
 #        vm01='192.168.122.142'
 #        fw.write('%s\n' %vm01)
         for j in range(0,argmt[i]):
+<<<<<<< HEAD
             if i==0:
                 print 'freeVMs writing',freeVMs[j]
                 fw.write('%s\n' %freeVMs[j])
@@ -99,6 +100,14 @@ def vm1(s,argmt,freeVMs):
 
         subprocess.call('ssh root@'+freeVMs[]mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i]+1)+' python mulpar_new.py '+s[i]+' &',shell=True)
 #        os.remove(fil_nam_freeVMs)
+=======
+            print 'freeVMs writing',freeVMs[j]
+            fw.write('%s\n' %freeVMs[j])
+            fw.close()
+#        print 'mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]
+        subprocess.call('mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]+' &',shell=True)
+        os.remove(fil_nam_freeVMs)
+>>>>>>> 52ef1af4f2045228569fc363ab7a99c45352687e
 
 
 def worker(queue):
@@ -214,6 +223,11 @@ def jobcreat(queue):
         data.append(time.time())
         queue.put(data)
         time.sleep(5)
+<<<<<<< HEAD
+=======
+#        else:
+#            time.sleep(20)
+>>>>>>> 52ef1af4f2045228569fc363ab7a99c45352687e
 
 if __name__ == "__main__":
     manage=Manager()
