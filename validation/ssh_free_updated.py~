@@ -84,8 +84,8 @@ def vm1(s,argmt,freeVMs):
             print 'freeVMs writing',freeVMs[j]
             fw.write('%s\n' %freeVMs[j])
             fw.close()
-        print 'mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]
-        subprocess.call('mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i],shell=True)
+#        print 'mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]
+        subprocess.call('mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]+' &',shell=True)
         os.remove(fil_nam_freeVMs)
 
 
@@ -192,21 +192,20 @@ def worker(queue):
 def jobcreat(queue):
     for i in range(20):
         print 'queue size IN JOB CREATE',queue.qsize() 
-        if queue.qsize()<10:
-            fil_name=str(11+i)+'.txt'
-            f=open(fil_name,'r')
-            data=f.read().split(',')
-            f.close()
-#            print data
-            data.append(time.time())
-            queue.put(data)
-            time.sleep(5)
-        else:
-            time.sleep(20)
+        fil_name=str(11+i)+'.txt'
+        f=open(fil_name,'r')
+        data=f.read().split(',')
+        f.close()
+#        print data
+        data.append(time.time())
+        queue.put(data)
+        time.sleep(5)
+#        else:
+#            time.sleep(20)
 
 if __name__ == "__main__":
     manage=Manager()
-    d=Value('d',0.0)
+#    d=Value('d',0.0)
 #    arr=Array('s')
     queue = Queue()
     Process(target=vmtimupdation,args=()).start()
