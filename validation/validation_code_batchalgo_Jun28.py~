@@ -77,35 +77,17 @@ def mat_creat(s,dt,free_vms):
     return A
 
 def vm1(s,argmt,freeVMs):
-#    print 's',s
-#    print 'argmt',argmt
-#    print 'freeVMs',freeVMs
-
     for i in range(0,len(s)):
         fil_nam_freeVMs='freeVMs'+str(i)+'.txt'
         fw=open(fil_nam_freeVMs,'w')
-#        vm01='192.168.122.142'
-#        fw.write('%s\n' %vm01)
         for j in range(0,argmt[i]):
-            if i==0:
-                print 'freeVMs writing',freeVMs[j]
-                fw.write('%s\n' %freeVMs[j])
-            else:
-                print 'freeVMs writing',freeVMs[j+argmt[i-1]]
-                fw.write('%s\n' %freeVMs[j+argmt[i-1]])
-        fw.close()
-#        time.sleep(1)
-#        print 'mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]
-
-        subprocess.call('ssh root@'+freeVMs[]mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i]+1)+' python mulpar_new.py '+s[i]+' &',shell=True)
-#        os.remove(fil_nam_freeVMs)
-
             print 'freeVMs writing',freeVMs[j]
             fw.write('%s\n' %freeVMs[j])
             fw.close()
 #        print 'mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]
         subprocess.call('mpiexec -f '+fil_nam_freeVMs+' -n'+' '+str(argmt[i])+' python mulpar_new.py '+s[i]+' &',shell=True)
         os.remove(fil_nam_freeVMs)
+
 
 def worker(queue):
     delay=[]
